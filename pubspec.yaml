@@ -5,34 +5,23 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.2.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
-  # UI & Routing
   cupertino_icons: ^1.0.2
-
-  # API Communication
-  http: ^1.1.0
-
-  # Location & Tracking
-  geolocator: ^10.1.0
-  flutter_background_service: ^3.0.0
-  flutter_background_service_android: ^3.0.0
-  flutter_background_service_ios: ^3.0.0
-
-  # Camera & File Upload
-  image_picker: ^1.0.4
-
-  # State & Utilities
-  shared_preferences: ^2.2.1
+  http: ^1.2.0
+  geolocator: ^11.0.0
+  flutter_background_service: ^3.4.0
+  image_picker: ^1.1.0
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.0
 
 flutter:
   uses-material-design: true
