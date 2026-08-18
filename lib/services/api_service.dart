@@ -4,7 +4,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://localhost:8000/api'; // Replace with real server IP in production
+  static const String baseUrl = 'https://r.rseha.com/api'; // Replace with real server IP in production
 
   static Future<bool> sendTrackingData({required int userId, required double lat, required double lng}) async {
     try {
