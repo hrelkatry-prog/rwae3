@@ -14,7 +14,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   http: ^1.2.0
   geolocator: ^11.0.0
-  flutter_background_service: ^3.4.0
+  flutter_background_service: ^5.1.0
   image_picker: ^1.1.0
   shared_preferences: ^2.2.3
 
