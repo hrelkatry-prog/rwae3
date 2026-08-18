@@ -32,21 +32,14 @@ jobs:
         run: |
           flutter create --platforms=android .
           sed -i 's/flutter.minSdkVersion/23/g' android/app/build.gradle
+          sed -i 's/version "1.7.1" apply false/version "1.9.0" apply false/g' android/settings.gradle
 
       - name: Install Dependencies
         run: flutter pub get
 
       - name: Build APK
         id: build_apk
-        run: flutter build apk --release > build_log.txt 2>&1
-        continue-on-error: true
-
-      - name: Upload Logs Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-logs
-          path: build_log.txt
+        run: flutter build apk --release
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
