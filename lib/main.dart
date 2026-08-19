@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:rwae3_mobile/widgets/gps_enforcer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:rwae3_mobile/screens/login_screen.dart';
@@ -55,6 +56,8 @@ bool onIosBackground(ServiceInstance service) {
   return true;
 }
 
+
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -66,6 +69,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
+      builder: (context, child) {
+        return GpsEnforcer(child: child!);
+      },
       home: const LoginScreen(),
     );
   }
