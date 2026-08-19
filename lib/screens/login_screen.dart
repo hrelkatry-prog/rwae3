@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rwae3_mobile/screens/home_screen.dart';
+import 'package:rwae3_mobile/screens/main_screen.dart';
 import 'package:rwae3_mobile/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -62,8 +62,9 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const MainScreen()),
         );
       }
     } else {
