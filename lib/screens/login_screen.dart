@@ -28,7 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final token = prefs.getString('auth_token');
     if (token != null && mounted) {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const MainScreen()),
       );
     }
   }
