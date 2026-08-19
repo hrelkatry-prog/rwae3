@@ -18,7 +18,7 @@ class ApiService {
       );
       return jsonDecode(response.body);
     } catch (e) {
-      return {'success': false, 'message': 'تعذر الاتصال بالخادم'};
+      return {'success': false, 'message': 'خطأ في الاتصال: ${e.toString()}'};
     }
   }
 
