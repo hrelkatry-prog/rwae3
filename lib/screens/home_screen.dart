@@ -32,39 +32,61 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('قائمة العملاء'),
-        actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: _loadCustomers),
-        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: _customers.length,
-              itemBuilder: (context, index) {
-                final customer = _customers[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: ListTile(
-                    leading: const CircleAvatar(
-                      backgroundColor: Colors.blue,
-                      child: Icon(Icons.store, color: Colors.white),
-                    ),
-                    title: Text(customer['name']),
-                    subtitle: Text(customer['phone'] ?? 'لا يوجد رقم'),
-                    trailing: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => VisitScreen(customer: customer),
+          : RefreshIndicator(
+              onRefresh: _loadCustomers,
+              child: _customers.isEmpty
+                  ? ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: [
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                        const Icon(Icons.people_outline, size: 80, color: Colors.grey),
+                        const SizedBox(height: 16),
+                        const Center(
+                          child: Text(
+                            'لا يوجد عملاء متاحين حالياً',
+                            style: TextStyle(fontSize: 20, color: Colors.grey),
+                          ),
+                        ),
+                        const Center(
+                          child: Text(
+                            'اسحب الشاشة للأسفل للتحديث',
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                        ),
+                      ],
+                    )
+                  : ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: _customers.length,
+                      itemBuilder: (context, index) {
+                        final customer = _customers[index];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: ListTile(
+                            leading: const CircleAvatar(
+                              backgroundColor: Colors.blue,
+                              child: Icon(Icons.store, color: Colors.white),
+                            ),
+                            title: Text(customer['name']),
+                            subtitle: Text(customer['phone'] ?? 'لا يوجد رقم'),
+                            trailing: ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => VisitScreen(customer: customer),
+                                  ),
+                                );
+                              },
+                              child: const Text('تسجيل زيارة'),
+                            ),
                           ),
                         );
                       },
-                      child: const Text('تسجيل زيارة'),
                     ),
-                  ),
-                );
-              },
             ),
     );
   }
