@@ -6,6 +6,22 @@ import 'package:image_picker/image_picker.dart';
 class ApiService {
   static const String baseUrl = 'https://r.rseha.com/api'; // Replace with real server IP in production
 
+  static Future<Map<String, dynamic>> login({required String phone, required String password}) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'phone': phone,
+          'password': password,
+        }),
+      );
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {'success': false, 'message': 'تعذر الاتصال بالخادم'};
+    }
+  }
+
   static Future<bool> sendTrackingData({required int userId, required double lat, required double lng}) async {
     try {
       final response = await http.post(

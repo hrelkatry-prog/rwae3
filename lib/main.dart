@@ -70,7 +70,10 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       builder: (context, child) {
-        return GpsEnforcer(child: child!);
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: GpsEnforcer(child: child!),
+        );
       },
       home: const LoginScreen(),
     );
