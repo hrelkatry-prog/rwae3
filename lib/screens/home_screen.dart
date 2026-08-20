@@ -62,21 +62,33 @@ class _HomeScreenState extends State<HomeScreen> {
   
   void _sortCustomers() {
     setState(() {
-      if (_sortMode == 'distance') {
-        _customers.sort((a, b) => (a['distance'] ?? double.infinity).compareTo(b['distance'] ?? double.infinity));
-      } else if (_sortMode == 'last_visit') {
-        _customers.sort((a, b) {
-          // Null means never visited, so it gets highest priority (shown first)
-          if (a['last_visit_date'] == null && b['last_visit_date'] != null) return -1;
-          if (a['last_visit_date'] != null && b['last_visit_date'] == null) return 1;
-          if (a['last_visit_date'] == null && b['last_visit_date'] == null) return 0;
+      _customers.sort((a, b) {
+        // Calculate a priority score for each customer. Lower score = higher rank (closer to top).
+        
+        double getScore(dynamic customer) {
+          double distanceScore = (customer['distance'] ?? double.infinity);
+          if (distanceScore == double.infinity) distanceScore = 9999999;
           
-          DateTime dateA = DateTime.tryParse(a['last_visit_date'].toString()) ?? DateTime.now();
-          DateTime dateB = DateTime.tryParse(b['last_visit_date'].toString()) ?? DateTime.now();
+          // Distance is in meters. Let's say 1 km = 1000 score.
+          double score = distanceScore;
           
-          return dateA.compareTo(dateB); // Oldest first
-        });
-      }
+          // Time penalty: subtract from score for older visits
+          if (customer['last_visit_date'] == null) {
+            // Never visited: Huge priority boost (appear as if they are 50km closer)
+            score -= 50000;
+          } else {
+            DateTime lastVisit = DateTime.tryParse(customer['last_visit_date'].toString()) ?? DateTime.now();
+            int daysSinceVisit = DateTime.now().difference(lastVisit).inDays;
+            
+            // For every day since last visit, they appear 1km closer.
+            score -= (daysSinceVisit * 1000); 
+          }
+          
+          return score;
+        }
+        
+        return getScore(a).compareTo(getScore(b));
+      });
     });
   }
 
@@ -95,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('قائمة العملاء'),
+        title: const Text('قائمة العملاء (الأقرب والأكثر احتياجاً للزيارة)', style: TextStyle(fontSize: 16)),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -103,30 +115,6 @@ class _HomeScreenState extends State<HomeScreen> {
               onRefresh: _loadCustomers,
               child: Column(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    color: Colors.grey[100],
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('ترتيب حسب:', style: TextStyle(fontWeight: FontWeight.bold)),
-                        DropdownButton<String>(
-                          value: _sortMode,
-                          underline: const SizedBox(),
-                          items: const [
-                            DropdownMenuItem(value: 'distance', child: Text('الأقرب مسافة')),
-                            DropdownMenuItem(value: 'last_visit', child: Text('الأطول بدون زيارة')),
-                          ],
-                          onChanged: (val) {
-                            if (val != null) {
-                              setState(() => _sortMode = val);
-                              _sortCustomers();
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
                   Expanded(
                     child: _customers.isEmpty
                         ? ListView(
