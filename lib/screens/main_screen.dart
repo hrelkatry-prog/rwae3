@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import '../services/sync_service.dart';
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'products_screen.dart';
@@ -13,6 +16,27 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
+  StreamSubscription? _connectivitySubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    // Try to sync initially when app opens
+    SyncService.syncPendingVisits();
+    
+    // Listen for connection changes and sync automatically in the background
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((result) {
+      if (!result.contains(ConnectivityResult.none)) {
+        SyncService.syncPendingVisits();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription?.cancel();
+    super.dispose();
+  }
 
   final List<Widget> _screens = [
     const HomeScreen(),

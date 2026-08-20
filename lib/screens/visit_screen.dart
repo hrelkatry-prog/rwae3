@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:rwae3_mobile/services/api_service.dart';
 import 'package:rwae3_mobile/services/location_service.dart';
+import 'package:rwae3_mobile/services/sync_service.dart';
 
 class VisitScreen extends StatefulWidget {
   final Map<String, dynamic> customer;
@@ -65,25 +66,46 @@ class _VisitScreenState extends State<VisitScreen> {
     }
 
     setState(() => _isSubmitting = true);
-    final result = await ApiService.submitVisit(
-      userId: 1, // Placeholder
-      customerId: widget.customer['id'],
-      lat: _currentPosition!.latitude,
-      lng: _currentPosition!.longitude,
-      isSuccessful: _isSuccessful,
-      notes: _notesController.text,
-      photo: _photo,
-    );
-    setState(() => _isSubmitting = false);
+    
+    try {
+      final result = await ApiService.submitVisit(
+        userId: 1, // Placeholder
+        customerId: widget.customer['id'],
+        lat: _currentPosition!.latitude,
+        lng: _currentPosition!.longitude,
+        isSuccessful: _isSuccessful,
+        notes: _notesController.text,
+        photo: _photo,
+      );
+      setState(() => _isSubmitting = false);
 
-    if (result['success']) {
-      if (mounted) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تسجيل الزيارة بنجاح')));
+      if (result['success']) {
+        if (mounted) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تسجيل الزيارة بنجاح')));
+        }
+      } else {
+        throw Exception(result['error']);
       }
-    } else {
+    } catch (e) {
+      // If it failed, save it locally for auto-sync
+      await SyncService.savePendingVisit({
+        'user_id': 1,
+        'customer_id': widget.customer['id'],
+        'latitude': _currentPosition!.latitude,
+        'longitude': _currentPosition!.longitude,
+        'is_successful': _isSuccessful ? 1 : 0,
+        'notes': _notesController.text,
+        'photo_path': _photo!.path,
+      });
+
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: ${result['error']}')));
+        setState(() => _isSubmitting = false);
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('تم الحفظ في الهاتف مؤقتاً لعدم توفر إنترنت. ستتم المزامنة لاحقاً.'),
+          backgroundColor: Colors.orange,
+        ));
       }
     }
   }
