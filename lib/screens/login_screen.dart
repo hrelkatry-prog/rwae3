@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:rwae3_mobile/screens/main_screen.dart';
 import 'package:rwae3_mobile/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('auth_token');
     if (token != null && mounted) {
+      FlutterBackgroundService().startService();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const MainScreen()),
       );
@@ -50,16 +52,21 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (response['success'] == true) {
+      final prefs = await SharedPreferences.getInstance();
+      
       if (_rememberMe) {
-        final prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', response['token']);
-        // Save user details
-        if (response['user'] != null) {
-          await prefs.setInt('user_id', response['user']['id']);
-          await prefs.setString('user_name', response['user']['name'] ?? '');
-          await prefs.setString('user_phone', response['user']['phone'] ?? '');
-        }
       }
+      
+      // Save user details for tracking and session
+      if (response['user'] != null) {
+        await prefs.setInt('user_id', response['user']['id']);
+        await prefs.setString('user_name', response['user']['name'] ?? '');
+        await prefs.setString('user_phone', response['user']['phone'] ?? '');
+      }
+
+      // Start the background tracking service
+      FlutterBackgroundService().startService();
 
       if (mounted) {
         Navigator.pushReplacement(

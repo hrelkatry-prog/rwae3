@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rwae3_mobile/widgets/gps_enforcer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -36,14 +37,19 @@ Future<void> initializeBackgroundService() async {
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   // This code runs in the background isolate
-  Timer.periodic(const Duration(minutes: 5), (timer) async {
+  
+  Timer.periodic(const Duration(minutes: 3), (timer) async {
     // 1. Get current location
     final position = await LocationService.getCurrentLocation();
-    if (position != null) {
-      // 2. Send to API
-      // Note: user_id needs to be stored in SharedPreferences and retrieved here
+    
+    // 2. Get user ID from SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('user_id');
+    
+    if (position != null && userId != null) {
+      // 3. Send to API
       await ApiService.sendTrackingData(
-        userId: 1, // Placeholder
+        userId: userId,
         lat: position.latitude,
         lng: position.longitude,
       );
