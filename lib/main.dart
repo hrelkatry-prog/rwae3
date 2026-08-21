@@ -40,6 +40,7 @@ Future<void> initializeBackgroundService() async {
       initialNotificationTitle: 'Rwae3 Service',
       initialNotificationContent: 'Tracking location in background',
       foregroundServiceNotificationId: 888,
+      foregroundServiceTypes: [AndroidForegroundType.location],
     ),
     iosConfiguration: IosConfiguration(
       autoStart: false,
