@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rwae3_mobile/screens/main_screen.dart';
 import 'package:rwae3_mobile/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,6 +36,25 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<bool> _requestPermissions() async {
+    // 1. Request Notifications (Android 13+)
+    await Permission.notification.request();
+
+    // 2. Request Foreground Location
+    var locationStatus = await Permission.location.request();
+    if (!locationStatus.isGranted) {
+      return false;
+    }
+
+    // 3. Request Background Location (Required for background service)
+    var bgLocationStatus = await Permission.locationAlways.request();
+    if (!bgLocationStatus.isGranted) {
+      // We can still try to start, but background tracking might fail
+    }
+
+    return true;
+  }
+
   void _login() async {
     if (_phoneController.text.trim().isEmpty || _passwordController.text.isEmpty) {
       setState(() => _errorMessage = "الرجاء إدخال رقم الهاتف وكلمة المرور");
@@ -64,6 +84,9 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.setString('user_name', response['user']['name'] ?? '');
         await prefs.setString('user_phone', response['user']['phone'] ?? '');
       }
+
+      // Request permissions before starting service
+      await _requestPermissions();
 
       // Start the background tracking service
       FlutterBackgroundService().startService();

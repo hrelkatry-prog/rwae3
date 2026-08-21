@@ -1,0 +1,46 @@
+
+Running Gradle task 'assembleRelease'...                        
+Checking the license for package Android SDK Build-Tools 30.0.3 in /usr/local/lib/android/sdk/licenses
+License for package Android SDK Build-Tools 30.0.3 accepted.
+Preparing "Install Android SDK Build-Tools 30.0.3 (revision: 30.0.3)".
+"Install Android SDK Build-Tools 30.0.3 (revision: 30.0.3)" ready.
+Installing Android SDK Build-Tools 30.0.3 in /usr/local/lib/android/sdk/build-tools/30.0.3
+"Install Android SDK Build-Tools 30.0.3 (revision: 30.0.3)" complete.
+"Install Android SDK Build-Tools 30.0.3 (revision: 30.0.3)" finished.
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Font asset "MaterialIcons-Regular.otf" was tree-shaken, reducing it from 1645184 to 1804 bytes (99.9% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+e: /home/runner/.gradle/caches/transforms-3/431ce31617111116ed092b20fb775fda/transformed/jetified-kotlin-stdlib-1.9.0.jar!/META-INF/kotlin-stdlib-jdk7.kotlin_module: Module was compiled with an incompatible version of Kotlin. The binary version of its metadata is 1.9.0, expected version is 1.7.1.
+e: /home/runner/.gradle/caches/transforms-3/431ce31617111116ed092b20fb775fda/transformed/jetified-kotlin-stdlib-1.9.0.jar!/META-INF/kotlin-stdlib-jdk8.kotlin_module: Module was compiled with an incompatible version of Kotlin. The binary version of its metadata is 1.9.0, expected version is 1.7.1.
+e: /home/runner/.gradle/caches/transforms-3/431ce31617111116ed092b20fb775fda/transformed/jetified-kotlin-stdlib-1.9.0.jar!/META-INF/kotlin-stdlib.kotlin_module: Module was compiled with an incompatible version of Kotlin. The binary version of its metadata is 1.9.0, expected version is 1.7.1.
+e: /home/runner/.gradle/caches/transforms-3/c321e7444a5c731da2398570d6ef04f1/transformed/jetified-kotlin-stdlib-common-1.9.0.jar!/META-INF/kotlin-stdlib-common.kotlin_module: Module was compiled with an incompatible version of Kotlin. The binary version of its metadata is 1.9.0, expected version is 1.7.1.
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileReleaseKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 2m 21s
+Running Gradle task 'assembleRelease'...                          141.6s
+
+┌─ Flutter Fix ────────────────────────────────────────────────────────────────────────────────┐
+│ [!] Your project requires a newer version of the Kotlin Gradle plugin.                       │
+│ Find the latest version on https://kotlinlang.org/docs/releases.html#release-details, then   │
+│ update the                                                                                   │
+│ version number of the plugin with id "org.jetbrains.kotlin.android" in the plugins block of  │
+│ /home/runner/work/rwae3/rwae3/android/settings.gradle.                                       │
+│                                                                                              │
+│ Alternatively (if your project was created before Flutter 3.19), update                      │
+│ /home/runner/work/rwae3/rwae3/android/build.gradle                                           │
+│ ext.kotlin_version = '<latest-version>'                                                      │
+└──────────────────────────────────────────────────────────────────────────────────────────────┘
+Gradle task assembleRelease failed with exit code 1

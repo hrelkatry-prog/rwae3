@@ -2,8 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String _userName = 'جاري التحميل...';
+  String _userPhone = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userName = prefs.getString('user_name') ?? 'المندوب';
+      _userPhone = prefs.getString('user_phone') ?? '';
+    });
+  }
 
   Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
@@ -35,23 +57,23 @@ class ProfileScreen extends StatelessWidget {
                     end: Alignment.bottomRight,
                   ),
                 ),
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(height: 40),
-                    CircleAvatar(
+                    const SizedBox(height: 40),
+                    const CircleAvatar(
                       radius: 50,
                       backgroundColor: Colors.white,
                       child: Icon(Icons.person, size: 60, color: Color(0xFF0083B0)),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
-                      'المندوب محمد', // In a real app, load from prefs
-                      style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                      _userName,
+                      style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      'مندوب مبيعات - منطقة الرياض',
-                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                      _userPhone.isNotEmpty ? _userPhone : 'مندوب مبيعات',
+                      style: const TextStyle(color: Colors.white70, fontSize: 14),
                     ),
                   ],
                 ),
