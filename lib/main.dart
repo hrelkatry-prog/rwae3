@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:rwae3_mobile/screens/login_screen.dart';
 import 'package:rwae3_mobile/services/location_service.dart';
+import 'dart:ui';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:rwae3_mobile/services/api_service.dart';
 
 void main() async {
@@ -15,6 +17,19 @@ void main() async {
 
 Future<void> initializeBackgroundService() async {
   final service = FlutterBackgroundService();
+
+  const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'rwae3_tracking', // id
+    'Rwae3 Service', // title
+    description: 'Tracking location in background', // description
+    importance: Importance.low, 
+  );
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
   
   await service.configure(
     androidConfiguration: AndroidConfiguration(
@@ -37,6 +52,7 @@ Future<void> initializeBackgroundService() async {
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   // This code runs in the background isolate
+  DartPluginRegistrant.ensureInitialized();
   WidgetsFlutterBinding.ensureInitialized();
   
   Timer.periodic(const Duration(minutes: 3), (timer) async {
