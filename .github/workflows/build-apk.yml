@@ -47,11 +47,10 @@ jobs:
         run: flutter build apk --release
 
       - name: Rename APK
-        working-directory: rwae3_mobile
         run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/mandoob_app.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: mandoob_app
-          path: rwae3_mobile/build/app/outputs/flutter-apk/mandoob_app.apk
+          path: build/app/outputs/flutter-apk/mandoob_app.apk
