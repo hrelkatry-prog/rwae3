@@ -29,10 +29,17 @@ class _LoginScreenState extends State<LoginScreen> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('auth_token');
     if (token != null && mounted) {
-      FlutterBackgroundService().startService();
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const MainScreen()),
-      );
+      // Request permissions before starting service on auto-login
+      bool permissionsGranted = await _requestPermissions();
+      if (permissionsGranted) {
+        FlutterBackgroundService().startService();
+      }
+      
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const MainScreen()),
+        );
+      }
     }
   }
 
