@@ -27,19 +27,26 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _checkSavedCredentials() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('auth_token');
-    if (token != null && mounted) {
-      // Request permissions before starting service on auto-login
-      bool permissionsGranted = await _requestPermissions();
-      if (permissionsGranted) {
-        FlutterBackgroundService().startService();
+    final rememberMe = prefs.getBool('remember_me') ?? false;
+    
+    if (rememberMe) {
+      final token = prefs.getString('auth_token');
+      if (token != null && mounted) {
+        // Request permissions before starting service on auto-login
+        bool permissionsGranted = await _requestPermissions();
+        if (permissionsGranted) {
+          FlutterBackgroundService().startService();
+        }
+        
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const MainScreen()),
+          );
+        }
       }
-      
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const MainScreen()),
-        );
-      }
+    } else {
+      // Clear token if we shouldn't remember the user
+      await prefs.remove('auth_token');
     }
   }
 
@@ -81,9 +88,10 @@ class _LoginScreenState extends State<LoginScreen> {
     if (response['success'] == true) {
       final prefs = await SharedPreferences.getInstance();
       
-      if (_rememberMe) {
-        await prefs.setString('auth_token', response['token']);
-      }
+      // Always save token for the current session so API calls work
+      await prefs.setString('auth_token', response['token']);
+      // Save remember me preference for next app launch
+      await prefs.setBool('remember_me', _rememberMe);
       
       // Save user details for tracking and session
       if (response['user'] != null) {
