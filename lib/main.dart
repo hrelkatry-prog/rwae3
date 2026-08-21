@@ -37,6 +37,7 @@ Future<void> initializeBackgroundService() async {
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   // This code runs in the background isolate
+  WidgetsFlutterBinding.ensureInitialized();
   
   Timer.periodic(const Duration(minutes: 3), (timer) async {
     // 1. Get current location
