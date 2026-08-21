@@ -2,15 +2,30 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   static const String baseUrl = 'https://r.rseha.com/api'; // Replace with real server IP in production
+
+  static Future<Map<String, String>> _getHeaders() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+    
+    return {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
 
   static Future<Map<String, dynamic>> login({required String phone, required String password}) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/login'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
         body: jsonEncode({
           'phone': phone,
           'password': password,
@@ -24,9 +39,10 @@ class ApiService {
 
   static Future<bool> sendTrackingData({required int userId, required double lat, required double lng}) async {
     try {
+      final headers = await _getHeaders();
       final response = await http.post(
         Uri.parse('$baseUrl/tracking'),
-        headers: {'Content-Type': 'application/json'},
+        headers: headers,
         body: jsonEncode({
           'user_id': userId,
           'latitude': lat,
@@ -42,7 +58,8 @@ class ApiService {
 
   static Future<List<dynamic>> fetchCustomers() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/customers'));
+      final headers = await _getHeaders();
+      final response = await http.get(Uri.parse('$baseUrl/customers'), headers: headers);
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       }
@@ -62,7 +79,9 @@ class ApiService {
     XFile? photo,
   }) async {
     try {
+      final headers = await _getHeaders();
       var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/visits'));
+      request.headers.addAll(headers);
       request.fields['user_id'] = userId.toString();
       request.fields['customer_id'] = customerId.toString();
       request.fields['latitude'] = lat.toString();
@@ -98,7 +117,8 @@ class ApiService {
 
   static Future<dynamic> get(String endpoint) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl$endpoint'));
+      final headers = await _getHeaders();
+      final response = await http.get(Uri.parse('$baseUrl$endpoint'), headers: headers);
       if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body);
       }
@@ -110,9 +130,10 @@ class ApiService {
 
   static Future<dynamic> post(String endpoint, Map<String, dynamic> data) async {
     try {
+      final headers = await _getHeaders();
       final response = await http.post(
         Uri.parse('$baseUrl$endpoint'),
-        headers: {'Content-Type': 'application/json'},
+        headers: headers,
         body: jsonEncode(data),
       );
       return jsonDecode(response.body);
