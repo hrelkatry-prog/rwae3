@@ -86,16 +86,29 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       // Request permissions before starting service
-      await _requestPermissions();
+      bool permissionsGranted = await _requestPermissions();
 
-      // Start the background tracking service
-      FlutterBackgroundService().startService();
+      if (permissionsGranted) {
+        // Start the background tracking service
+        FlutterBackgroundService().startService();
 
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const MainScreen()),
-        );
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const MainScreen()),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('يجب الموافقة على صلاحيات الموقع لكي تتمكن من الدخول للتطبيق'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        setState(() => _isLoading = false);
+        return;
       }
     } else {
       setState(() {
